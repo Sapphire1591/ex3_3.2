@@ -4,71 +4,95 @@
 #include "list.h"
 #include "mtm_ex3.h"
 
-/**
-
-*/
-
+struct SOrder;
 typedef struct SOrder *Order;
 
+TechnionFaculty getOrderFaculty(Order order);
 
-Order CopyOrder(Order);
+char* getOrderEmail(Order order);
+
+int getOrderID(Order order);
+
+int getOrderDay(Order order);
+
+int getOrderHour(Order order);
+
+int getOrderPeople(Order order);
+
+int getOrderPrice(Order order);
+
+ListResult setOrderFaculty(Order order, TechnionFaculty faculty);
+
+ListResult setOrderEmail(Order order, char* email);
+
+ListResult setOrderID(Order order, int ID);
+
+ListResult setOrderDay(Order order, int day);
+
+ListResult setOrderHour(Order order, int hour);
+
+ListResult setOrderPeople(Order order, int num_ppl);
+
+ListResult setOrderPrice(Order order, int total_price);
+
+ListElement CopyOrder(ListElement order);
 
 
-void DeleteOrder(Order);
+void DeleteOrder(ListElement order);
 
 
-int CompareOrders(Order, Order);
+int CompareOrders(ListElement order1, ListElement order2);
 
 
 typedef void* OrderFilterKey;
 
 
-bool FilterOrderList(Order, OrderFilterKey);
+//bool FilterOrderList(Order, OrderFilterKey);
 
 
-Order orderListCreate(CopyOrder copy, DeleteOrder delete);
+List orderListCreate(CopyListElement copy, FreeListElement delete);
 
 
-Order orderListCopy(Order list);
+List orderListCopy(List list);//?
 
 
-int orderListGetSize(Order list);
+int orderListGetSize(List list);
 
 
-Order getFirstOrder(Order list);
+Order getFirstOrder(List list);
 
 
-Order getNextOrder(OrderList list);
+Order getNextOrder(List list);
 
 
-Order getCurrentOrder(OrderList list);
+Order getCurrentOrder(List list);
 
 
-ListResult insertOrderFirst(OrderList list, Order order);
+ListResult insertOrderFirst(List list, Order order);
 
 
-ListResult insertOrderLast(OrderList list, Order order);
+ListResult insertOrderLast(List list, Order order);
 
 
-ListResult insertOrderBeforeCurrent(OrderList list, Order order);
+ListResult insertOrderBeforeCurrent(List list, Order order);
 
 
-ListResult insertOrderAfterCurrent(OrderList list, Order order);
+ListResult insertOrderAfterCurrent(List list, Order order);
 
 
-ListResult removeCurrentOrder(OrderList list);
+ListResult removeCurrentOrder(List list);
 
 
-ListResult sortOrders(OrderList list, CompareOrders compare);
+ListResult sortOrders(List list, CompareListElements compare);
 
 
-OrderList filterOrders(OrderList list, FilterOrderList filter, OrderFilterKey key);
+List filterOrders(List list, FilterListElement filter, ListFilterKey key);
 
 
-ListResult clearOrders(OrderList list);
+ListResult clearOrders(List list);
 
 
-void destroyOrderList(OrderList list);
+void destroyOrderList(List list);
 
 
 #define LIST_FOREACH(type,iterator,list) \
@@ -76,4 +100,4 @@ void destroyOrderList(OrderList list);
 		iterator ;\
 		iterator = listGetNext(list))
 
-#endif /* ORDERS_H_ */
+#endif /*ORDERS_H_*/
