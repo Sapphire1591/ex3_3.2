@@ -190,6 +190,7 @@ static bool testListInsertFirst() {
     setOrderHour(first, 18);
     setOrderPeople(first, 3);
     setOrderPrice(first, 40);
+    insertOrderFirst(list, first);
     ASSERT_TEST(getOrderID(getFirstOrder(list)) == getOrderID(first));
     return true;
 }
