@@ -3,283 +3,305 @@
 #include <assert.h>
 #include <string.h>
 
-#include "list_mtm1.h"
+#include "room.h"
+//#include "list_mtm1.h"
 
-typedef struct list_node {
-    ListElement data;
-    struct list_node* next;
-}*Node;
-
-struct list_t {
-    Node head;
-    Node iterator;
-    CopyListElement copy;
-    FreeListElement free;
+struct SRoom {
+    char* email; //room email address
+    int ID; //room ID
+    int opening; //opening hour - hh:00
+    int closing; //closing hour - hh:00
+    int num_ppl; //room capacity
+    int price; //price per person
+    int difficulty; //required skill level
+    Order order_list; //points to the 'head' of this room's order list
 };
 
-List listCreate(CopyListElement copyElement, FreeListElement freeElement){
-    if(!copyElement || !freeElement){
+char* getRoomEmail(Room room) {
+    if (room == NULL) {
         return NULL;
     }
-    List list = malloc(sizeof(struct list_t));
-    if (!list) {
+    return room->email;
+}
+
+int getRoomID(Room room) {
+    if (room == NULL) {
+        return -1;
+    }
+    return room->ID;
+}
+
+int getRoomOpening(Room room) {
+    if (room == NULL) {
+        return -1;
+    }
+    return room->opening;
+}
+
+int getRoomClosing(Room room) {
+    if (room == NULL) {
+        return -1;
+    }
+    return room->closing;
+}
+
+int getRoomCapacity(Room room) {
+    if (room == NULL) {
+        return -1;
+    }
+    return room->num_ppl;
+}
+
+int getRoomPrice(Room room) {
+    if (room == NULL) {
+        return -1;
+    }
+    return room->price;
+}
+
+int getRoomDifficulty(Room room) {
+    if (room == NULL) {
+        return -1;
+    }
+    return room->difficulty;
+}
+
+Order getRoomOrders (Room room) {
+    if (room == NULL) {
         return NULL;
     }
-    list->head = malloc(sizeof(struct list_node));
-    if (!list->head) {
+    return room->order_list;
+}
+
+ListResult setRoomEmail(Room room, char* email) {
+    if (room == NULL || email == NULL) {
+        return LIST_NULL_ARGUMENT;
+    }
+    room->email = malloc(strlen(email)+1);
+    if (room->email == NULL) {
+        return LIST_OUT_OF_MEMORY;
+    }
+    strcpy(room->email, email);
+    return LIST_SUCCESS;
+}
+
+ListResult setRoomID(Room room, int ID) {
+    if (room == NULL) {
+        return LIST_NULL_ARGUMENT;
+    }
+    room->ID = ID;
+    return LIST_SUCCESS;
+}
+
+ListResult setRoomOpening(Room room, int opening_hour) {
+    if (room == NULL) {
+        return LIST_NULL_ARGUMENT;
+    }
+    room->opening = opening_hour;
+    return LIST_SUCCESS;
+}
+
+ListResult setRoomClosing(Room room, int closing_hour) {
+    if (room == NULL) {
+        return LIST_NULL_ARGUMENT;
+    }
+    room->closing = closing_hour;
+    return LIST_SUCCESS;
+}
+
+ListResult setRoomCapacity(Room room, int num_ppl) {
+    if (room == NULL) {
+        return LIST_NULL_ARGUMENT;
+    }
+    room->num_ppl = num_ppl;
+    return LIST_SUCCESS;
+}
+
+ListResult setRoomPrice(Room room, int price) {
+    if (room == NULL) {
+        return LIST_NULL_ARGUMENT;
+    }
+    room->price = price;
+    return LIST_SUCCESS;
+}
+
+ListResult setRoomDifficulty(Room room, int difficulty) {
+    if (room == NULL) {
+        return LIST_NULL_ARGUMENT;
+    }
+    room->difficulty = difficulty;
+    return LIST_SUCCESS;
+}
+
+ListResult setRoomOrder (Room room, Order order) {
+    if (room == NULL) {
+        return LIST_NULL_ARGUMENT;
+    }
+    //?
+    return LIST_SUCCESS;
+}
+
+ListElement CopyRoom(ListElement room) {
+    assert(room);
+    Room room_copy = malloc(sizeof(struct SRoom));
+    if (room_copy == NULL) {
         return NULL;
     }
-    list->head->data = NULL;
-    list->head->next = NULL;
-    list->iterator = malloc(sizeof(struct list_node));
-    if (!list->iterator) {
+    if (setRoomEmail(room_copy, getRoomEmail(room)) != LIST_SUCCESS ||
+        setRoomID(room_copy, getRoomID(room)) != LIST_SUCCESS ||
+        setRoomOpening(room_copy, getRoomOpening(room)) != LIST_SUCCESS ||
+        setRoomClosing(room_copy, getRoomClosing(room)) != LIST_SUCCESS ||
+        setRoomCapacity(room_copy, getRoomCapacity(room)) != LIST_SUCCESS ||
+        setRoomPrice(room_copy, getRoomPrice(room)) != LIST_SUCCESS ||
+        setRoomDifficulty(room_copy, getRoomDifficulty(room)) != LIST_SUCCESS) {//orders?
         return NULL;
     }
-    list->iterator = list->head->next;
-    list->copy = copyElement;
-    list->free = freeElement;
+    return room_copy;
+}
+
+void DeleteRoom(ListElement room) {
+    assert(room);
+    free(getRoomEmail(room));
+    free(room);
+}
+
+int CompareRooms(ListElement room1, ListElement room2);//by what? make sure ID isn't recurring?
+
+
+List roomListCreate(CopyListElement CopyRoom, FreeListElement DeleteRoom) {
+    assert(CopyRoom && DeleteRoom);
+    List list = listCreate(CopyRoom, DeleteRoom);
+    if (list == NULL) {
+        return NULL;
+    }
     return list;
 }
 
-List listCopy(List list) {
-    if(!list){
+
+List roomListCopy(List list) {
+    assert(list);
+    List list_copy = listCopy(list);
+    if (list_copy == NULL) {
         return NULL;
     }
-    List new_list = listCreate(list->copy, list->free);
-    if (!new_list) {
-        return NULL;
-    }
-    Node element = list->head->next;
-    Node new_element = new_list->head->next;
-    while (element) {
-        new_element = list->copy(element);
-        element = element->next;
-        new_element = new_element->next;
-    }
-    new_list->iterator = list->iterator;
-    return new_list;
+    return list_copy;
 }
 
-int listGetSize(List list) {
-    if(!list){
+
+int roomListGetSize(List list) {
+    assert(list);
+    int room_num = listGetSize(list);
+    if (room_num < 0) {
         return -1;
     }
-    int counter = 0;
-    Node current = list->head->next;
-    while (current) {
-        counter++;
-        current = current->next;
-    }
-    return counter;
-}
-
-ListElement listGetFirst(List list) {
-    if(!list){
-        return NULL;
-    }
-    if (list->head->next) {
-        list->iterator = list->head->next;
-        return list->head->next->data;
-    }
-    return NULL; //list is empty
-}
-
-ListElement listGetNext(List list) {
-    if(!list){
-        return NULL;
-    }
-    Node current = listGetCurrent(list);
-    if (!current || !current->next) {
-        return NULL;
-    }
-    list->iterator = current->next;
-    return current->next->data;
-}
-
-ListElement listGetCurrent(List list) {
-    if(!list){
-        return NULL;
-    }
-    return list->iterator->data;
-}
-
-ListResult listInsertFirst(List list, ListElement element) {
-    if(!list || !element){
-        LIST_NULL_ARGUMENT;
-    }
-    Node new_node = malloc(sizeof(struct list_node));
-    if (!new_node) {
-        return LIST_OUT_OF_MEMORY;
-    }
-    new_node->data = element;
-    new_node->next = list->head->next;
-    list->head->next = new_node;
-    return LIST_SUCCESS;
-}
-
-ListResult listInsertLast(List list, ListElement element) {
-    if(!list || !element){
-        LIST_NULL_ARGUMENT;
-    }
-    Node new_node = malloc(sizeof(struct list_node));
-    if (!new_node) {
-        return LIST_OUT_OF_MEMORY;
-    }
-    Node last_node = list->head->next;
-    if (last_node == NULL) {
-        new_node->data = element;
-        new_node->next = NULL;
-        list->head->next = new_node;
-        return LIST_SUCCESS;
-    }
-    else
-        while (last_node->next) { //finds the "next" that points to NULL
-            last_node = last_node->next;
-        }
-    new_node->data = element;
-    new_node->next = NULL;
-    last_node->next = new_node;
-    return LIST_SUCCESS;
-}
-
-ListResult listInsertBeforeCurrent(List list, ListElement element) {
-    if(list || element){
-        LIST_NULL_ARGUMENT;
-    }
-    Node new_node = malloc(sizeof(struct list_node));
-    if (!new_node) {
-        return LIST_OUT_OF_MEMORY;
-    }
-    Node before_current = list->head->next;
-    //find the "next" that points to current:
-    while (before_current->next != list->iterator) {
-        before_current = before_current->next;
-    }
-    new_node->data = element;
-    new_node->next = before_current->next;
-    before_current->next = new_node;
-    return LIST_SUCCESS;
-}
-
-ListResult listInsertAfterCurrent(List list, ListElement element) {
-    if(!list && !element){
-        LIST_NULL_ARGUMENT;
-    }
-    if(!listGetCurrent(list)){
-        LIST_INVALID_CURRENT;
-    }
-    Node new_node = malloc(sizeof(struct list_node));
-    if (!new_node) {
-        return LIST_OUT_OF_MEMORY;
-    }
-    new_node->data = element;
-    new_node->next = list->iterator->next;
-    list->iterator->next = new_node;
-    return LIST_SUCCESS;
+    return room_num;
 }
 
 
-ListResult listRemoveCurrent(List list){
-    if(!list){
-        LIST_NULL_ARGUMENT;
-    }
-    if(!listGetCurrent(list)){
-        LIST_INVALID_CURRENT;
-    }
-    Node next = list->iterator->next;
-    listInsertBeforeCurrent(list, next);
-    list->free(list->iterator->data);
-    free(list->iterator);
-    list->iterator = NULL;
-    return LIST_SUCCESS;
-}
-
-static void swap(Node a, Node b){
-    ListElement temp = a->data;
-    a->data = b->data;
-    b->data = temp;
-}
-
-ListResult listSort(List list, CompareListElements compareElement){
-    if(!list || !compareElement){
-        return LIST_NULL_ARGUMENT;
-    }
-    Node ptr = NULL; //pointer to the compared element
-    list->iterator = listGetFirst(list);
-    if(list->iterator){
-        ptr = list->iterator->next;
-    }
-    while(list->iterator){
-        while(ptr){
-            if(compareElement(ptr, list->iterator) > 0){
-                swap(ptr, list->iterator);
-            }
-            else{
-                ptr = ptr->next;
-            }
-        }
-    }
-    return LIST_SUCCESS;
-}
-
-/*
-    //bubble sort:
-    bool sorted = false; //signs that the list is sorted
-    list->iterator = listGetFirst(list);
-    Node ptr = NULL; //ptr to the compared element
-
-    while(!list->iterator){
-        ptr = list->iterator->next;
-        else if(compareElement(list->iterator, ptr)){ //what if ptr==NULL?
-            listInsertBeforeCurrent(list, ptr);
-            ptr = list->iterator->next;
-        }
-        else{
-            list->iterator = list->iterator->next;
-        }
-    }
-}
-*/
-
-List listFilter(List list, FilterListElement filterElement, ListFilterKey key) {
-    if(!list){
-        return NULL;
-    }
-    List new_list = listCreate(list->copy, list->free);
-    if(!new_list){
-        return NULL;
-    }
-    Node ptr = list->head->next;
-    if (!ptr) {
-        return NULL;
-    }
-    while(ptr){
-        if(filterElement(ptr->data, key)) {
-            listInsertLast(new_list, ptr->data);
-        }
-        ptr = ptr->next;
-    }
-    new_list->iterator = new_list->head->next;
-    return new_list;
-}
-
-ListResult listClear(List list){
-    if(list){
-        return LIST_NULL_ARGUMENT;
-    }
-    Node ptr;
-    while(!list->head->next){
-        ptr = list->head->next;
-        list->free(ptr->data);
-        ptr = ptr->next;
-        free(list->head->next);
-        list->head->next = ptr;
-    }
-    return LIST_SUCCESS;
-}
-
-void listDestroy(List list) {
+Room getFirstRoom(List list) {
     assert(list);
-    listClear(list);
-    free(list);
+    Room first = listGetFirst(list);
+    if (first == NULL) {
+        return NULL;
+    }
+    return first;
+}
+
+
+Room getNextRoom(List list) {
+    assert(list);
+    Room next = listGetNext(list);
+    if (next == NULL) {
+        return NULL;
+    }
+    return next;
+}
+
+
+Room getCurrentRoom(List list) {
+    assert(list);
+    Room current = listGetCurrent(list);
+    if (current == NULL) {
+        return NULL;
+    }
+    return current;
+}
+
+
+ListResult insertRoomFirst(List list, Room room) {
+    assert(list && room);
+    ListResult insert_result = listInsertFirst(list, room);
+    if (insert_result != LIST_SUCCESS) {
+        return insert_result;
+    }
+    return LIST_SUCCESS;
+}
+
+
+ListResult insertRoomLast(List list, Room room) {
+    assert(list && room);
+    ListResult insert_result = listInsertLast(list, room);
+    if (insert_result != LIST_SUCCESS) {
+        return insert_result;
+    }
+    return LIST_SUCCESS;
+}
+
+
+ListResult insertRoomBeforeCurrent(List list, Room room) {
+    assert(list && room);
+    ListResult insert_result = listInsertBeforeCurrent(list, room);
+    if (insert_result != LIST_SUCCESS) {
+        return insert_result;
+    }
+    return LIST_SUCCESS;
+}
+
+
+ListResult insertRoomAfterCurrent(List list, Room room) {
+    assert(list && room);
+    ListResult insert_result = listInsertAfterCurrent(list, room);
+    if (insert_result != LIST_SUCCESS) {
+        return insert_result;
+    }
+    return LIST_SUCCESS;
+}
+
+
+ListResult removeCurrentRoom(List list) {
+    assert(list);
+    ListResult remove_result = listRemoveCurrent(list);
+    if (remove_result != LIST_SUCCESS) {
+        return remove_result;
+    }
+    return LIST_SUCCESS;
+}
+
+
+ListResult sortRooms(List list, CompareListElements compare) {
+    assert(list && compare);
+    ListResult sort_result = listSort(list, compare);
+    if (sort_result != LIST_SUCCESS) {
+        return sort_result;
+    }
+    return LIST_SUCCESS;//maybe just "return sort_result"?
+}
+
+
+//List filterRooms(List list, FilterListElement filter, ListFilterKey key);
+
+
+ListResult clearRooms(List list) {
+    assert(list);
+    ListResult clear_result = listClear(list);
+    if (clear_result != LIST_SUCCESS) {
+        return clear_result;
+    }
+    return LIST_SUCCESS;
+}
+
+
+void destroyRoomList(List list) {
+    assert(list);
+    listDestroy(list);
 }
