@@ -14,7 +14,7 @@ struct SRoom {
     int num_ppl; //room capacity
     int price; //price per person
     int difficulty; //required skill level
-    Order order_list; //points to the 'head' of this room's order list
+    int order_num; //number of standing orders for the room
 };
 
 char* getRoomEmail(Room room) {
@@ -66,11 +66,11 @@ int getRoomDifficulty(Room room) {
     return room->difficulty;
 }
 
-Order getRoomOrders (Room room) {
+int getRoomOrderNum (Room room) {
     if (room == NULL) {
-        return NULL;
+        return -1;
     }
-    return room->order_list;
+    return room->order_num;
 }
 
 ListResult setRoomEmail(Room room, char* email) {
@@ -133,11 +133,27 @@ ListResult setRoomDifficulty(Room room, int difficulty) {
     return LIST_SUCCESS;
 }
 
-ListResult setRoomOrder (Room room, Order order) {
+ListResult setRoomOrders(Room room, int order_num) {
     if (room == NULL) {
         return LIST_NULL_ARGUMENT;
     }
-    //?
+    room->order_num = order_num;
+    return LIST_SUCCESS;
+}
+
+ListResult incRoomOrders(Room room) {
+    if (room == NULL) {
+        return LIST_NULL_ARGUMENT;
+    }
+    room->order_num++;
+    return LIST_SUCCESS;
+}
+
+ListResult decRoomOrders(Room room) {
+    if (room == NULL) {
+        return LIST_NULL_ARGUMENT;
+    }
+    room->order_num--;
     return LIST_SUCCESS;
 }
 
@@ -153,7 +169,8 @@ ListElement CopyRoom(ListElement room) {
         setRoomClosing(room_copy, getRoomClosing(room)) != LIST_SUCCESS ||
         setRoomCapacity(room_copy, getRoomCapacity(room)) != LIST_SUCCESS ||
         setRoomPrice(room_copy, getRoomPrice(room)) != LIST_SUCCESS ||
-        setRoomDifficulty(room_copy, getRoomDifficulty(room)) != LIST_SUCCESS) {//orders?
+        setRoomDifficulty(room_copy, getRoomDifficulty(room)) != LIST_SUCCESS ||
+        setRoomOrders(room_copy, getRoomOrderNum(room)) != LIST_SUCCESS) {
         return NULL;
     }
     return room_copy;
@@ -165,7 +182,7 @@ void DeleteRoom(ListElement room) {
     free(room);
 }
 
-int CompareRooms(ListElement room1, ListElement room2);//by what? make sure ID isn't recurring?
+//int CompareRooms(ListElement room1, ListElement room2);//by what? make sure ID isn't recurring?
 
 
 List roomListCreate(CopyListElement CopyRoom, FreeListElement DeleteRoom) {

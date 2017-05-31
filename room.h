@@ -21,7 +21,7 @@ int getRoomPrice(Room room);
 
 int getRoomDifficulty(Room room);
 
-Order getRoomOrders (Room room);
+int getRoomOrderNum (Room room);
 
 ListResult setRoomEmail(Room room, char* email);
 
@@ -34,6 +34,14 @@ ListResult setRoomClosing(Room room, int closing_hour);
 ListResult setRoomCapacity(Room room, int num_ppl);
 
 ListResult setRoomPrice(Room room, int price);
+
+ListResult setRoomDifficulty(Room room, int difficulty);
+
+ListResult setRoomOrders(Room room, int order_num);
+
+ListResult incRoomOrders(Room room);
+
+ListResult decRoomOrders(Room room);
 
 ListElement CopyRoom(ListElement room);
 
